@@ -2,25 +2,19 @@
 Accounts.oauth.registerService("apple");
 
 if (Meteor.isClient) {
-  const loginWithApple = (options, callback) => {
+  const loginWithApple = async (options, callback) => {
     // support a callback without options
     if (!callback && typeof options === "function") {
       callback = options;
       options = null;
     }
-
-    const credentialRequestCompleteCallback = Accounts.oauth.credentialRequestCompleteHandler(
-      callback
-    );
-    Apple.requestCredential(
-      options,
-      credentialRequestCompleteCallback,
-      callback
-    );
+    const credentialRequestCompleteCallback = await Accounts.oauth.credentialRequestCompleteHandler(callback);
+    await Apple.requestCredential(options, credentialRequestCompleteCallback, callback);
   };
   Accounts.registerClientLoginFunction("apple", loginWithApple);
   Meteor.loginWithApple = (...args) => Accounts.applyLoginFunction("apple", args);
-} else {
+}
+else {
   Accounts.addAutopublishFields({
     forLoggedInUser: Apple.whitelistedFields
       .concat(["accessToken", "expiresAt"])
